@@ -22,8 +22,8 @@ jobs:
       - name: Get latest video
         id: get_video
         run:
-          RET=$(~/.local/bin/yt-dlp -I1 --flat-playlist --print webpage_url "https://www.youtube.com/@simplyceo/videos") &&
-          if [ ! -z "${RET}" ]; then echo "${RET}" > .urlfile; fi
+          RET=$(~/.local/bin/yt-dlp -I1 --flat-playlist --print webpage_url "https://www.youtube.com/@simplyceo/videos");
+          if [ ! -z "${RET}" ]; then echo "${RET}" > .urlfile; else echo "https://www.youtube.com/" > .urlfile; fi
 
       - name: Commit changes
         run:
