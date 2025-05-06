@@ -2,16 +2,18 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>[YT] SimplyCEO's latest video</title>
+    <title>fetching...</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script>
       async function getLastVideo()
       {
-        fetch('https://raw.githubusercontent.com/SimplyCEO/latest-youtube-video/refs/heads/master/.urlfile')
+        const CHANNEL_NAME = "SimplyCEO";
+        const URL = "https://raw.githubusercontent.com/" + CHANNEL_NAME + "/latest-youtube-video/refs/heads/master/.urlfile";
+        fetch(URL)
         .then(response =>
         {
           if (!response.ok)
-          { throw new Error('Network response was not ok ' + response.statusText); }
+          { throw new Error('Network response failed ' + response.statusText); }
           return response.text();
         })
         .then(data =>
