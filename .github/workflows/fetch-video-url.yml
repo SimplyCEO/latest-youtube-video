@@ -1,0 +1,36 @@
+name: Fetch YouTube URL
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-url:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yt-dlp
+        run:
+          sudo apt install -y curl;
+          mkdir -p ~/.local/bin;
+          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp;
+          chmod a+rx ~/.local/bin/yt-dlp
+
+      - name: Get latest video
+        id: get_video
+        run:
+          RET=$(~/.local/bin/yt-dlp -I1 --flat-playlist --print webpage_url "https://www.youtube.com/@simplyceo/videos");
+          if [ ! -z "${RET}" ]; then echo "${RET}" > .urlfile; fi
+
+      - name: Commit changes
+        run:
+          git config --local user.email "action@github.com";
+          git config --local user.name "GitHub Action";
+          git add .urlfile;
+          git commit -m "Updated latest video URL" || echo "No changes to commit"
+
+      - name: Push changes
+        run: git push

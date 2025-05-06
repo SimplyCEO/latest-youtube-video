@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>[YT] SimplyCEO's latest video</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+      async function getLastVideo()
+      {
+        fetch('https://raw.githubusercontent.com/SimplyCEO/last-youtube-video/refs/heads/master/.urlfile')
+        .then(response =>
+        {
+          if (!response.ok)
+          { throw new Error('Network response was not ok ' + response.statusText); }
+          return response.text();
+        })
+        .then(data =>
+        {
+          window.location.href = data;
+        })
+        .catch(error =>
+        {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+      }
+      window.onload = getLastVideo;
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to the latest video...</p>
+  </body>
+</html>
+
