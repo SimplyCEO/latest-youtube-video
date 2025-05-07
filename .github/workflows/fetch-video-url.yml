@@ -45,7 +45,7 @@ jobs:
           # Get page information from `page.conf`
           TITLE=$(sed "1q;d" data/page.conf)
           DESCRIPTION=$(sed "2q;d" data/page.conf)
-          printf "<\!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"UTF-8\">\n\t<title>${TITLE}</title>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\">\n\t<script>\n\t\tasync function getLatestYouTubeURL()\n\t\t{\n\t\t\twindow.location.href = \"${URL}\";\n\t\t}\n\t\twindow.onload = getLatestYouTubeURL;\n\t</script>\n</head>\n<body>\n\t<p>${DESCRIPTION}</p>\n</body>\n</html>\n\n" > index.html
+          printf '<!DOCTYPE html>'"\n<html>\n<head>\n\t<meta charset=\"UTF-8\">\n\t<title>${TITLE}</title>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\">\n\t<script>\n\t\tasync function getLatestYouTubeURL()\n\t\t{\n\t\t\twindow.location.href = \"${URL}\";\n\t\t}\n\t\twindow.onload = getLatestYouTubeURL;\n\t</script>\n</head>\n<body>\n\t<p>${DESCRIPTION}</p>\n</body>\n</html>\n" > index.html
 
       - name: Commit changes
         id: commit
