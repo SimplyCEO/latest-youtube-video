@@ -1,4 +1,4 @@
-name: Fetch YouTube URL
+name: Fetch latest YouTube video URL
 
 on:
   schedule:
@@ -12,26 +12,49 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install yt-dlp
-        run:
-          sudo apt install -y curl &&
-          mkdir -p ~/.local/bin &&
-          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp &&
-          chmod a+rx ~/.local/bin/yt-dlp
+      - name: Fetch latest URL
+        id: fetch_video_url
+        run: |
+          if [ -f "./yt-dlp" ]; then
+            # Get YouTube channel nickname from `credentials.conf`
+            CHANNEL_NAME=$(sed "1q;d" credentials.conf)
 
-      - name: Get latest video
-        id: get_video
-        run:
-          CHANNEL_NAME="SimplyCEO";
-          RET=$(~/.local/bin/yt-dlp -I1 --flat-playlist --print webpage_url "https://www.youtube.com/@${CHANNEL_NAME}/videos" 2>/dev/null || true);
-          if [ ! -z "${RET}" ]; then echo "${RET}" > .urlfile; else echo "https://www.youtube.com/@${CHANNEL_NAME}" > .urlfile; fi
+            # Check if nickname exists. If not, default to YouTube
+            if [ -z "${CHANNEL_NAME}" ]; then
+              CHANNEL_NAME="youtube"
+            fi
+
+            # Extract @ char in case of declaration
+            CHANNEL_NAME="${CHANNEL_NAME#@}"
+
+            # Fetch for the latest video URL. If there is none, default to channel page.
+            URL=$(./yt-dlp --playlist-items 1 --flat-playlist --print webpage_url "https://www.youtube.com/@${CHANNEL_NAME}/videos" 2>/dev/null || true)
+            if [ -z "${URL}" ]; then
+              URL="https://www.youtube.com/@${CHANNEL_NAME}"
+            fi
+
+            # Export the URL as an environment variable
+            echo "LATEST_VIDEO_URL=${URL}" >> $GITHUB_ENV
+          fi
+
+      - name: Generate index.html
+        id: generate_index
+        env:
+          URL: ${{ env.LATEST_VIDEO_URL }}
+        run: |
+          # Get page information from `page.conf`
+          TITLE=$(sed "1q;d" page.conf)
+          DESCRIPTION=$(sed "2q;d" page.conf)
+          printf "<\!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"UTF-8\">\n\t<title>${TITLE}</title>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\">\n\t<script>\n\t\tasync function getLatestYouTubeURL()\n\t\t{\n\t\t\twindow.location.href = \"${URL}\";\n\t\t}\n\t\twindow.onload = getLatestYouTubeURL;\n\t</script>\n</head>\n<body>\n\t<p>${DESCRIPTION}</p>\n</body>\n</html>\n\n" > index.html
 
       - name: Commit changes
-        run:
-          git config --local user.email "action@github.com" &&
-          git config --local user.name "GitHub Action" &&
-          git add .urlfile &&
-          git commit -m "Updated latest video URL" || echo "No changes to commit"
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git commit -m "index.html: Updated YouTube URL" || echo "No changes to commit"
 
       - name: Push changes
+        id: push
         run: git push

@@ -1,35 +1,19 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>fetching...</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <script>
-      async function getLastVideo()
-      {
-        const CHANNEL_NAME = "SimplyCEO";
-        const URL = "https://raw.githubusercontent.com/" + CHANNEL_NAME + "/latest-youtube-video/refs/heads/master/.urlfile";
-        fetch(URL)
-        .then(response =>
-        {
-          if (!response.ok)
-          { throw new Error('Network response failed ' + response.statusText); }
-          return response.text();
-        })
-        .then(data =>
-        {
-          window.location.href = data;
-        })
-        .catch(error =>
-        {
-          console.error('There was a problem with the fetch operation:', error);
-        });
-      }
-      window.onload = getLastVideo;
-    </script>
-  </head>
-  <body>
-    <p>Redirecting to the latest video...</p>
-  </body>
+<head>
+	<meta charset="UTF-8">
+	<title>Fetching URL...</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<script>
+		async function getLatestYouTubeURL()
+		{
+			window.location.href = "https://www.youtube.com/@simplyceo";
+		}
+		window.onload = getLatestYouTubeURL;
+	</script>
+</head>
+<body>
+	<p>Redirecting to the latest video...</p>
+</body>
 </html>
 

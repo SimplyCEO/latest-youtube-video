@@ -1,0 +1,32 @@
+name: Fetch dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  update-url:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install YouTube downloader
+        id: install_youtube_downloader
+        run: |
+          sudo apt update && sudo apt install -y curl
+          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ./yt-dlp
+          chmod a+rx ./yt-dlp
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git commit -m "yt-dlp: Updated YouTube downloader" || echo "No changes to commit"
+
+      - name: Push changes
+        id: push
+        run: git push
