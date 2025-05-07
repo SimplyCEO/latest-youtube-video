@@ -24,7 +24,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add index.html
+          git add yt-dlp
           git commit -m "yt-dlp: Updated YouTube downloader" || echo "No changes to commit"
 
       - name: Push changes
